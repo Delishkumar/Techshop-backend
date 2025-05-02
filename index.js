@@ -5,13 +5,24 @@ const cors = require("cors")
 const mongoose = require("mongoose")
 const nodemailer = require("nodemailer")
 const app = express();
+
+
 const PORT = 5000;
 
 app.use(cors())
 app.use(express.json())
 
+
+
+// Increase payload size limit (default is 100kb)
+app.use(express.json({ limit: '60mb' }));
+app.use(express.urlencoded({ extended: true, limit: '60mb' }));
+
 mongoose.connect("mongodb+srv://arun:arun123@cluster0.zgcjldn.mongodb.net/form?retryWrites=true&w=majority&appName=Cluster0").then(()=>{console.log("mongodb connect")})
 .catch(()=>{console.log("db connect fail")})
+
+
+//Models
 
 const Contacts = mongoose.model("Contacts",{name:String,email:String,message:String},"contacts")
 const CartItem = mongoose.model("CartItem",{name: String,
@@ -37,8 +48,51 @@ const CartItem = mongoose.model("CartItem",{name: String,
       default: Date.now,
     }},"orders")
 
+    const Product = mongoose.model("Product",{ id: Number,
+      name: String,
+      brand: String,
+      price: Number,
+      rating: Number,
+      image: String, 
+      details: String,
+      instock: Number,
+         
+      reviews: [
+        {
+          user: String,
+          comment: String,
+          rating: Number,
+          date: { type: Date, default: Date.now }
+        }
+      ]                            ,},"products")
 
+//Add products
+
+
+app.post('/api/products', async (req, res) => {
   
+  try {
+    const products = req.body;
+
+    const insertedProducts = await Product.insertMany(products);
+    res.status(201).json(insertedProducts);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to insert products' });
+  }
+});
+  
+
+
+
+// Get all products
+app.get('/api/products', async (req, res) => {
+  try {
+    const products = await Product.find(); // fetch all products
+    res.json(products);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch products' });
+  }
+});
 
   // Get Cart Items
 app.get('/api/cart', async (req, res) => {
@@ -87,6 +141,64 @@ app.get('/count', async (req, res) => {
   }
 });
 
+
+
+
+
+
+// GET single product by ID
+app.get('/api/products/:id', async (req, res) => {
+  try {
+    const productId = req.params.id;
+
+    const product = await Product.findById(productId);
+
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    res.json(product);
+  } catch (error) {
+    console.error('Error fetching product:', error.message);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+
+// ✅ PUT Route to update product or add a review
+app.put('/api/products/:id', async (req, res) => {
+  try {
+    const productId = req.params.id;
+    const { user, comment, rating } = req.body;
+
+    const product = await Product.findById(productId);
+
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    // Add review to product
+    const newReview = {
+      user,
+      comment,
+      rating,
+    };
+
+    product.reviews.push(newReview);
+
+    // Optionally, update average rating
+    product.rating =
+      product.reviews.reduce((acc, item) => item.rating + acc, 0) /
+      product.reviews.length;
+
+    await product.save();
+
+    res.status(200).json({ message: 'Review added successfully', product });
+  } catch (error) {
+    console.error('Error updating product:', error);
+    res.status(500).json({ message: 'Server Error', error: error.message });
+  }
+});
 
 
 
