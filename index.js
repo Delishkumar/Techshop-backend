@@ -186,10 +186,15 @@ app.put('/api/products/:id', async (req, res) => {
 
     product.reviews.push(newReview);
 
-    // Optionally, update average rating
+    //  update average rating
     product.rating =
+  Number(
+    (
       product.reviews.reduce((acc, item) => item.rating + acc, 0) /
-      product.reviews.length;
+      product.reviews.length
+    ).toFixed(1)
+  );
+
 
     await product.save();
 
