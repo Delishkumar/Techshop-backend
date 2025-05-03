@@ -1,6 +1,6 @@
 
 
-const express = require('express');
+const express = require ('express');
 const cors = require("cors")
 const mongoose = require("mongoose")
 const nodemailer = require("nodemailer")
@@ -31,22 +31,28 @@ const CartItem = mongoose.model("CartItem",{name: String,
 
 
 
-  const Order = mongoose.model("Order",{ name: String,
+  const Order = mongoose.model("Order",{ 
+    userId: String,
+    name: String,
     email: String,
     address: String,
     phone: String,
-    cartItems: [
+   CartItems: [
       {
         name: String,
-        price: Number,
         quantity: Number,
-      }
+        price: Number,
+      },
     ],
-    totalAmount: Number,
+    totalPrice: Number,
+    status: {
+      type: String,
+      default: 'Processing',
+    },
     createdAt: {
       type: Date,
       default: Date.now,
-    }},"orders")
+    },},"orders")
 
     const Product = mongoose.model("Product",{ id: Number,
       name: String,
@@ -248,6 +254,9 @@ catch(error){
 
 
 });
+
+
+
 
 
 
