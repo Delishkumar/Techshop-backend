@@ -125,19 +125,7 @@ app.post('/api/order', async (req, res) => {
   try {
     const order = new Order(req.body);
     await order.save();
-    const mailOptions = {
-      from: 'delishkumar800@gmail.com',
-      to: 'delishkumar39@gmail.com', 
-      subject: 'New Order',
-      text: `
-        Name: ${req.body.name}
-        Email: ${req.body.email}
-        Message: ${req.body.message}
-      `
-    };
-  
-  await transporter.sendMail(mailOptions);
-  res.send("sucessfull")
+    
     
     await CartItem.deleteMany({});
 
