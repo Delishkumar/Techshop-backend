@@ -61,8 +61,10 @@ const CartItem = mongoose.model("CartItem",{name: String,
       rating: Number,
       image: String, 
       details: String,
-      instock: Number,
-         
+      stock: Number,
+      description:  String,
+      category: String, 
+
       reviews: [
         {
           user: String,
@@ -70,7 +72,8 @@ const CartItem = mongoose.model("CartItem",{name: String,
           rating: Number,
           date: { type: Date, default: Date.now }
         }
-      ]                            ,},"products")
+      ]
+    },"products")
 
 //Add products
 
@@ -82,6 +85,7 @@ app.post('/api/products', async (req, res) => {
 
     const insertedProducts = await Product.insertMany(products);
     res.status(201).json(insertedProducts);
+    console.log("saved")
   } catch (error) {
     res.status(500).json({ error: 'Failed to insert products' });
   }
@@ -93,10 +97,71 @@ app.post('/api/products', async (req, res) => {
 // Get all products
 app.get('/api/products', async (req, res) => {
   try {
-    const products = await Product.find(); // fetch all products
+    const products = await Product.find(); 
     res.json(products);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch products' });
+  }
+});
+
+// get single product
+
+app.get('/headphones', async (req, res) => {
+  try {
+    const headphones = await Product.find({ category: "headphone" });
+    res.json(headphones);
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
+
+app.get('/watches', async (req, res) => {
+  try {
+    const smartwatchs = await Product.find({ category: "smartwatch" });
+    res.json(smartwatchs);
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
+app.get('/desktops', async (req, res) => {
+  try {
+    const desktops = await Product.find({ category: "desktop" });
+    res.json(desktops);
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
+app.get('/monitors', async (req, res) => {
+  try {
+    const monitors = await Product.find({ category: "monitor" });
+    res.json(monitors);
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
+app.get('/tablets', async (req, res) => {
+  try {
+    const tablets = await Product.find({ category: "tablet" });
+    res.json(tablets);
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.get('/laptops', async (req, res) => {
+  try {
+    const leptops = await Product.find({ category: "laptop" });
+    res.json(leptops);
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -120,21 +185,7 @@ app.delete('/api/cart/:id', async (req, res) => {
 });
 
 
-// Place new order
-app.post('/api/order', async (req, res) => {
-  try {
-    const order = new Order(req.body);
-    await order.save();
-    
-    
-    await CartItem.deleteMany({});
 
-    res.status(201).json({ message: 'Order placed successfully' });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to place order' });
-  }
-});
 
 
 // Get total number of cart items
@@ -171,7 +222,7 @@ app.get('/api/products/:id', async (req, res) => {
 });
 
 
-// ✅ PUT Route to update product or add a review
+//   add a review
 app.put('/api/products/:id', async (req, res) => {
   try {
     const productId = req.params.id;
@@ -257,6 +308,20 @@ catch(error){
 
 
 
+// Place new order
+app.post('/api/order', async (req, res) => {
+  try {
+    const order = new Order(req.body);
+    await order.save();
+
+    await CartItem.deleteMany({});
+
+    res.status(201).json({ message: 'Order placed successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to place order' });
+  }
+})
 
 
 
