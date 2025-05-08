@@ -13,11 +13,6 @@ app.use(cors())
 app.use(express.json())
 
 
-
-// Increase payload size limit (default is 100kb)
-app.use(express.json({ limit: '60mb' }));
-app.use(express.urlencoded({ extended: true, limit: '60mb' }));
-
 mongoose.connect("mongodb+srv://arun:arun123@cluster0.zgcjldn.mongodb.net/form?retryWrites=true&w=majority&appName=Cluster0").then(()=>{console.log("mongodb connect")})
 .catch(()=>{console.log("db connect fail")})
 
@@ -104,66 +99,7 @@ app.get('/api/products', async (req, res) => {
   }
 });
 
-// get single product
 
-app.get('/headphones', async (req, res) => {
-  try {
-    const headphones = await Product.find({ category: "headphone" });
-    res.json(headphones);
-  } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-
-
-app.get('/watches', async (req, res) => {
-  try {
-    const smartwatchs = await Product.find({ category: "smartwatch" });
-    res.json(smartwatchs);
-  } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-
-app.get('/desktops', async (req, res) => {
-  try {
-    const desktops = await Product.find({ category: "desktop" });
-    res.json(desktops);
-  } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-
-app.get('/monitors', async (req, res) => {
-  try {
-    const monitors = await Product.find({ category: "monitor" });
-    res.json(monitors);
-  } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-
-app.get('/tablets', async (req, res) => {
-  try {
-    const tablets = await Product.find({ category: "tablet" });
-    res.json(tablets);
-  } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-app.get('/laptops', async (req, res) => {
-  try {
-    const leptops = await Product.find({ category: "laptop" });
-    res.json(leptops);
-  } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
 
   // Get Cart Items
 app.get('/api/cart', async (req, res) => {
